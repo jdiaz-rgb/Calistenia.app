@@ -1,0 +1,24 @@
+.favorite-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: color 0.2s ease, transform 0.15s ease, background 0.2s ease;
+}
+
+.favorite-button.is-active {
+  color: #ff375f;
+  background: rgba(255, 55, 95, 0.15);
+}
+
+.favorite-button:active {
+  transform: scale(0.88);
+}
+
+.favorite-button:disabled {
+  opacity: 0.5;
+}

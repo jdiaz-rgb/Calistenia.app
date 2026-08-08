@@ -1,0 +1,35 @@
+.option-card {
+  width: 100%;
+  padding: 22px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-glass);
+  border: 1px solid var(--border-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.option-card:active {
+  transform: scale(0.97);
+  background: var(--surface-glass-strong);
+}
+
+.option-card:hover {
+  border-color: var(--accent, var(--border-glass));
+}
+
+.option-card__title {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  color: var(--text-primary);
+}
+
+.option-card__subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
