@@ -1,5 +1,5 @@
 import { Heart } from 'lucide-react';
-import coverPhoto from '../assets/cover.jpeg';
+import coverPhoto from '../assets/IMG_2361.jpeg';
 import { CategoryCard } from '../components/CategoryCard';
 import type { MuscleGroup } from '../types/exercise';
 import './HomeScreen.css';
