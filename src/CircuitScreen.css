@@ -1,0 +1,43 @@
+.circuit-screen__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.circuit-screen__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.circuit-chip {
+  min-width: 56px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--surface-glass);
+  border: 1px solid var(--border-glass);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.circuit-chip:active {
+  transform: scale(0.94);
+}
+
+.circuit-chip.is-selected {
+  background: #fff;
+  color: #05050a;
+  border-color: #fff;
+}
+
+.circuit-screen__summary {
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: var(--surface-glass);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}

@@ -1,0 +1,21 @@
+.selection-screen__title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-top: 12px;
+  margin-bottom: 6px;
+}
+
+.selection-screen__caption {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  line-height: 1.4;
+}
+
+.selection-screen__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
