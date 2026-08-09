@@ -1,4 +1,5 @@
 import { DynamicIcon } from './DynamicIcon';
+import { Check } from 'lucide-react';
 import './CategoryCard.css';
 
 interface CategoryCardProps {
@@ -6,13 +7,14 @@ interface CategoryCardProps {
   icon: string;
   color: string;
   colorSoft: string;
+  selected?: boolean;
   onClick: () => void;
 }
 
-export function CategoryCard({ label, icon, color, colorSoft, onClick }: CategoryCardProps) {
+export function CategoryCard({ label, icon, color, colorSoft, selected, onClick }: CategoryCardProps) {
   return (
     <button
-      className="category-card"
+      className={`category-card ${selected ? 'is-selected' : ''}`}
       style={{ '--accent': color, '--accent-soft': colorSoft } as React.CSSProperties}
       onClick={onClick}
     >
@@ -20,7 +22,9 @@ export function CategoryCard({ label, icon, color, colorSoft, onClick }: Categor
         <DynamicIcon name={icon} size={26} strokeWidth={2} />
       </span>
       <span className="category-card__label">{label}</span>
-      <DynamicIcon name="chevron-right" size={18} className="category-card__chevron" />
+      <span className={`category-card__checkbox ${selected ? 'is-checked' : ''}`}>
+        {selected && <Check size={14} strokeWidth={3} />}
+      </span>
     </button>
   );
 }

@@ -9,7 +9,12 @@
   border: 1px solid var(--border-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  transition: transform 0.18s ease, background 0.18s ease;
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.category-card.is-selected {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, transparent), rgba(255, 255, 255, 0.05));
 }
 
 .category-card:active {
@@ -38,7 +43,20 @@
   color: var(--text-primary);
 }
 
-.category-card__chevron {
-  color: var(--text-tertiary);
+.category-card__checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  color: #05050a;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.category-card__checkbox.is-checked {
+  background: var(--accent);
+  border-color: var(--accent);
 }
