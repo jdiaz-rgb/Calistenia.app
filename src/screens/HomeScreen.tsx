@@ -5,7 +5,9 @@ import type { MuscleGroup } from '../types/exercise';
 import './HomeScreen.css';
 
 interface HomeScreenProps {
-  onSelectMuscleGroup: (group: MuscleGroup) => void;
+  selectedMuscleGroups: MuscleGroup[];
+  onToggleMuscleGroup: (group: MuscleGroup) => void;
+  onContinue: () => void;
   onOpenFavorites: () => void;
 }
 
@@ -17,10 +19,11 @@ const CATEGORIES: { group: MuscleGroup; label: string; icon: string; color: stri
   { group: 'gluteos', label: 'Glúteos', icon: 'flame', color: 'var(--color-gluteos)', colorSoft: 'var(--color-gluteos-soft)' },
 ];
 
-export function HomeScreen({ onSelectMuscleGroup, onOpenFavorites }: HomeScreenProps) {
+export function HomeScreen({ selectedMuscleGroups, onToggleMuscleGroup, onContinue, onOpenFavorites }: HomeScreenProps) {
   const today = new Date();
   const hour = today.getHours();
   const greeting = hour < 12 ? 'Buenos días' : hour < 20 ? 'Buenas tardes' : 'Buenas noches';
+  const hasSelection = selectedMuscleGroups.length > 0;
 
   return (
     <div className="home-screen">
@@ -37,8 +40,8 @@ export function HomeScreen({ onSelectMuscleGroup, onOpenFavorites }: HomeScreenP
         </div>
       </div>
 
-      <div className="home-screen__body screen" style={{ paddingTop: 24 }}>
-        <p className="home-screen__section-label">Elige un grupo muscular</p>
+      <div className="home-screen__body screen" style={{ paddingTop: 24, paddingBottom: hasSelection ? 100 : undefined }}>
+        <p className="home-screen__section-label">Elige uno o varios grupos musculares</p>
         <div className="home-screen__list">
           {CATEGORIES.map((c) => (
             <CategoryCard
@@ -47,11 +50,20 @@ export function HomeScreen({ onSelectMuscleGroup, onOpenFavorites }: HomeScreenP
               icon={c.icon}
               color={c.color}
               colorSoft={c.colorSoft}
-              onClick={() => onSelectMuscleGroup(c.group)}
+              selected={selectedMuscleGroups.includes(c.group)}
+              onClick={() => onToggleMuscleGroup(c.group)}
             />
           ))}
         </div>
       </div>
+
+      {hasSelection && (
+        <div className="home-screen__cta">
+          <button className="start-button" onClick={onContinue}>
+            Continuar ({selectedMuscleGroups.length})
+          </button>
+        </div>
+      )}
     </div>
   );
 }

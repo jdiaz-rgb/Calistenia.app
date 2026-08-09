@@ -1,11 +1,12 @@
 import { TopBar } from '../components/TopBar';
 import { DynamicIcon } from '../components/DynamicIcon';
+import { unlockAudio } from '../lib/beep';
 import type { DurationMinutes, Level, MuscleGroup, RoutineExercise } from '../types/exercise';
 import { MUSCLE_GROUP_LABELS, LEVEL_LABELS } from '../types/exercise';
 import './RoutinePreviewScreen.css';
 
 interface RoutinePreviewScreenProps {
-  muscleGroup: MuscleGroup;
+  muscleGroups: MuscleGroup[];
   level: Level;
   duration: DurationMinutes;
   routine: RoutineExercise[];
@@ -13,13 +14,15 @@ interface RoutinePreviewScreenProps {
   onBack: () => void;
 }
 
-export function RoutinePreviewScreen({ muscleGroup, level, duration, routine, onStart, onBack }: RoutinePreviewScreenProps) {
+export function RoutinePreviewScreen({ muscleGroups, level, duration, routine, onStart, onBack }: RoutinePreviewScreenProps) {
+  const groupsLabel = muscleGroups.map((g) => MUSCLE_GROUP_LABELS[g]).join(' + ');
+
   return (
     <div>
       <TopBar onBack={onBack} title="Tu rutina" step={{ current: 3, total: 3 }} />
       <div className="screen">
         <h1 className="preview-screen__title">
-          {MUSCLE_GROUP_LABELS[muscleGroup]} · {LEVEL_LABELS[level]}
+          {groupsLabel} · {LEVEL_LABELS[level]}
         </h1>
         <p className="preview-screen__caption">
           {routine.length} ejercicios · {duration} minutos aproximados
@@ -44,7 +47,13 @@ export function RoutinePreviewScreen({ muscleGroup, level, duration, routine, on
       </div>
 
       <div className="preview-screen__cta">
-        <button className="start-button" onClick={onStart}>
+        <button
+          className="start-button"
+          onClick={() => {
+            unlockAudio();
+            onStart();
+          }}
+        >
           Empezar rutina
         </button>
       </div>

@@ -4,14 +4,16 @@ import { MUSCLE_GROUP_LABELS } from '../types/exercise';
 import './CompletionScreen.css';
 
 interface CompletionScreenProps {
-  muscleGroup: MuscleGroup;
+  muscleGroups: MuscleGroup[];
   level: Level;
   duration: DurationMinutes;
   exerciseCount: number;
   onRestart: () => void;
 }
 
-export function CompletionScreen({ muscleGroup, duration, exerciseCount, onRestart }: CompletionScreenProps) {
+export function CompletionScreen({ muscleGroups, duration, exerciseCount, onRestart }: CompletionScreenProps) {
+  const groupsLabel = muscleGroups.map((g) => MUSCLE_GROUP_LABELS[g].toLowerCase()).join(', ');
+
   return (
     <div className="screen completion-screen">
       <div className="completion-screen__icon">
@@ -19,7 +21,7 @@ export function CompletionScreen({ muscleGroup, duration, exerciseCount, onResta
       </div>
       <h1 className="completion-screen__title">¡Rutina completada!</h1>
       <p className="completion-screen__caption">
-        Terminaste {exerciseCount} ejercicios de {MUSCLE_GROUP_LABELS[muscleGroup].toLowerCase()} en aproximadamente {duration} minutos.
+        Terminaste {exerciseCount} ejercicios de {groupsLabel} en aproximadamente {duration} minutos.
       </p>
       <button className="start-button" onClick={onRestart}>
         Volver al inicio

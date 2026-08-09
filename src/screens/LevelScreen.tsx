@@ -5,7 +5,7 @@ import { MUSCLE_GROUP_LABELS } from '../types/exercise';
 import './SelectionScreen.css';
 
 interface LevelScreenProps {
-  muscleGroup: MuscleGroup;
+  muscleGroups: MuscleGroup[];
   onSelect: (level: Level) => void;
   onBack: () => void;
 }
@@ -16,13 +16,17 @@ const LEVELS: { value: Level; subtitle: string }[] = [
   { value: 'avanzado', subtitle: 'Buscas un reto exigente' },
 ];
 
-export function LevelScreen({ muscleGroup, onSelect, onBack }: LevelScreenProps) {
+export function LevelScreen({ muscleGroups, onSelect, onBack }: LevelScreenProps) {
+  const groupLabels = muscleGroups.map((g) => MUSCLE_GROUP_LABELS[g]);
+  const title = groupLabels.length > 2 ? `${groupLabels.length} grupos` : groupLabels.join(' + ');
+  const caption = groupLabels.join(', ').toLowerCase();
+
   return (
     <div>
-      <TopBar onBack={onBack} title={MUSCLE_GROUP_LABELS[muscleGroup]} step={{ current: 1, total: 3 }} />
+      <TopBar onBack={onBack} title={title} step={{ current: 1, total: 3 }} />
       <div className="screen">
         <h1 className="selection-screen__title">¿Cuál es tu nivel?</h1>
-        <p className="selection-screen__caption">Ajustaremos la intensidad de tu rutina de {MUSCLE_GROUP_LABELS[muscleGroup].toLowerCase()}.</p>
+        <p className="selection-screen__caption">Ajustaremos la intensidad de tu rutina de {caption}.</p>
         <div className="selection-screen__list">
           {LEVELS.map((l) => (
             <OptionCard

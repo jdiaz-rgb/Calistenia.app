@@ -5,15 +5,20 @@ import { ProgressRing } from '../components/ProgressRing';
 import { FavoriteButton } from '../components/FavoriteButton';
 import { useCountdown } from '../hooks/useCountdown';
 import { addFavorite, isFavorite, removeFavorite } from '../data/favorites';
+import { playBeep, unlockAudio } from '../lib/beep';
 import type { MuscleGroup, RoutineExercise } from '../types/exercise';
 import './WorkoutScreen.css';
 
 interface WorkoutScreenProps {
   routine: RoutineExercise[];
-  muscleGroup: MuscleGroup;
   onExit: () => void;
   onFinish: () => void;
 }
+
+/** Segundos antes de empezar un ejercicio en los que sonará el aviso. */
+const READY_BEEP_AT = 4;
+/** Segundos antes de terminar un ejercicio en los que sonará el aviso. */
+const FINISH_BEEP_AT = 3;
 
 const GROUP_COLOR: Record<MuscleGroup, string> = {
   pecho: 'var(--color-pecho)',
@@ -25,11 +30,13 @@ const GROUP_COLOR: Record<MuscleGroup, string> = {
 
 type Phase = 'trabajo' | 'descanso';
 
-export function WorkoutScreen({ routine, muscleGroup, onExit, onFinish }: WorkoutScreenProps) {
+export function WorkoutScreen({ routine, onExit, onFinish }: WorkoutScreenProps) {
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>('trabajo');
   const exercise = routine[index];
-  const accent = GROUP_COLOR[muscleGroup];
+  // Cada ejercicio lleva su propio grupo muscular (útil en rutinas mezcladas),
+  // así que el color de acento va cambiando según el ejercicio actual.
+  const accent = GROUP_COLOR[exercise.muscleGroup];
   const isLast = index === routine.length - 1;
 
   const isTimed = Boolean(exercise.workSeconds);
@@ -92,6 +99,23 @@ export function WorkoutScreen({ routine, muscleGroup, onExit, onFinish }: Workou
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, phase]);
 
+  // Desbloquea el audio en cuanto se entra a la pantalla (por si el navegador
+  // aún no lo había desbloqueado con un gesto anterior del usuario).
+  useEffect(() => {
+    unlockAudio();
+  }, []);
+
+  // Pitidos de aviso: uno antes de EMPEZAR cada ejercicio (durante el
+  // descanso) y otro antes de TERMINARLO (durante el propio ejercicio).
+  useEffect(() => {
+    if (!isRunning) return;
+    if (phase === 'descanso' && secondsLeft === READY_BEEP_AT) {
+      playBeep('ready');
+    } else if (phase === 'trabajo' && isTimed && secondsLeft === FINISH_BEEP_AT) {
+      playBeep('finish');
+    }
+  }, [phase, secondsLeft, isRunning, isTimed]);
+
   const total = phaseSeconds || exercise.restSeconds || 1;
   const progress = 1 - secondsLeft / total;
   const minutes = Math.floor(secondsLeft / 60);
@@ -126,7 +150,14 @@ export function WorkoutScreen({ routine, muscleGroup, onExit, onFinish }: Workou
             {phase === 'trabajo' ? (isTimed ? 'restantes' : 'sugeridos') : 'de descanso'}
           </span>
         </ProgressRing>
-        <button className="workout-screen__play-pause" onClick={toggle} aria-label={isRunning ? 'Pausar' : 'Reanudar'}>
+        <button
+          className="workout-screen__play-pause"
+          onClick={() => {
+            unlockAudio();
+            toggle();
+          }}
+          aria-label={isRunning ? 'Pausar' : 'Reanudar'}
+        >
           {isRunning ? <Pause size={22} /> : <Play size={22} />}
         </button>
       </div>

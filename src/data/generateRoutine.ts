@@ -20,9 +20,13 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Genera una rutina automática combinando ejercicios del grupo muscular elegido.
- * Prioriza el nivel exacto y, si no hay suficientes ejercicios, recurre a
- * niveles adyacentes para completar el tiempo solicitado.
+ * Genera una rutina automática combinando ejercicios de uno o varios grupos
+ * musculares. Prioriza el nivel exacto y, si no hay suficientes ejercicios,
+ * recurre a niveles adyacentes para completar el tiempo solicitado.
+ *
+ * Si se eligen varios grupos musculares, los ejercicios se intercalan
+ * (round-robin) para que la rutina quede mezclada en lugar de hacer
+ * primero todo un grupo y luego el siguiente.
  */
 export function generateRoutine(config: RoutineConfig): RoutineExercise[] {
   const targetSeconds = config.duration * 60;
@@ -33,26 +37,39 @@ export function generateRoutine(config: RoutineConfig): RoutineExercise[] {
     (a, b) => Math.abs(LEVEL_ORDER.indexOf(a) - levelIndex) - Math.abs(LEVEL_ORDER.indexOf(b) - levelIndex)
   );
 
-  const pool = shuffle(
-    exercises
-      .filter((e) => e.muscleGroup === config.muscleGroup)
-      .sort((a, b) => levelPriority.indexOf(a.level) - levelPriority.indexOf(b.level))
-  );
+  // Un "pool" (mazo de cartas) por cada grupo muscular elegido, ya barajado
+  // y ordenado por cercanía al nivel elegido.
+  const pools = config.muscleGroups
+    .map((group) =>
+      shuffle(
+        exercises
+          .filter((e) => e.muscleGroup === group)
+          .sort((a, b) => levelPriority.indexOf(a.level) - levelPriority.indexOf(b.level))
+      )
+    )
+    .filter((pool) => pool.length > 0);
 
-  if (pool.length === 0) return [];
+  if (pools.length === 0) return [];
 
   const selected: Exercise[] = [];
   let total = 0;
-  let i = 0;
+  const cursors = pools.map(() => 0);
+  let groupTurn = 0;
+  let safety = 0;
+  const maxIterations = pools.reduce((sum, pool) => sum + pool.length, 0) * 6;
 
-  // Vamos añadiendo ejercicios (repitiendo el ciclo si es necesario) hasta cubrir la duración
-  while (total < targetSeconds) {
-    const exercise = pool[i % pool.length];
+  // Vamos añadiendo ejercicios turnándonos entre grupos (round-robin) hasta
+  // cubrir la duración solicitada, repitiendo el ciclo de cada grupo si es necesario.
+  while (total < targetSeconds && safety < maxIterations) {
+    const pool = pools[groupTurn % pools.length];
+    const cursorIndex = groupTurn % pools.length;
+    const exercise = pool[cursors[cursorIndex] % pool.length];
+
     selected.push(exercise);
     total += estimateExerciseSeconds(exercise);
-    i++;
-    // Salvaguarda para evitar bucles infinitos con datos muy pequeños
-    if (i > pool.length * 6) break;
+    cursors[cursorIndex]++;
+    groupTurn++;
+    safety++;
   }
 
   return selected.map((exercise, index) => ({

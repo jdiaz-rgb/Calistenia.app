@@ -21,18 +21,24 @@ const ACCENT_SOFT: Record<MuscleGroup, string> = {
 
 function App() {
   const [step, setStep] = useState<Step>('home');
-  const [muscleGroup, setMuscleGroup] = useState<MuscleGroup | null>(null);
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([]);
   const [level, setLevel] = useState<Level | null>(null);
   const [duration, setDuration] = useState<DurationMinutes | null>(null);
   const [routine, setRoutine] = useState<RoutineExercise[]>([]);
 
   const backdropStyle = useMemo(() => {
-    if (!muscleGroup) return undefined;
-    return { '--accent-soft': ACCENT_SOFT[muscleGroup] } as React.CSSProperties;
-  }, [muscleGroup]);
+    if (muscleGroups.length === 0) return undefined;
+    return { '--accent-soft': ACCENT_SOFT[muscleGroups[0]] } as React.CSSProperties;
+  }, [muscleGroups]);
 
-  const handleSelectMuscleGroup = (group: MuscleGroup) => {
-    setMuscleGroup(group);
+  const handleToggleMuscleGroup = (group: MuscleGroup) => {
+    setMuscleGroups((prev) =>
+      prev.includes(group) ? prev.filter((g) => g !== group) : [...prev, group]
+    );
+  };
+
+  const handleContinueFromHome = () => {
+    if (muscleGroups.length === 0) return;
     setStep('level');
   };
 
@@ -42,15 +48,15 @@ function App() {
   };
 
   const handleSelectDuration = (d: DurationMinutes) => {
-    if (!muscleGroup || !level) return;
+    if (muscleGroups.length === 0 || !level) return;
     setDuration(d);
-    const generated = generateRoutine({ muscleGroup, level, duration: d });
+    const generated = generateRoutine({ muscleGroups, level, duration: d });
     setRoutine(generated);
     setStep('preview');
   };
 
   const handleRestart = () => {
-    setMuscleGroup(null);
+    setMuscleGroups([]);
     setLevel(null);
     setDuration(null);
     setRoutine([]);
@@ -62,22 +68,27 @@ function App() {
       <div className="glow-backdrop" style={backdropStyle} />
 
       {step === 'home' && (
-        <HomeScreen onSelectMuscleGroup={handleSelectMuscleGroup} onOpenFavorites={() => setStep('favorites')} />
+        <HomeScreen
+          selectedMuscleGroups={muscleGroups}
+          onToggleMuscleGroup={handleToggleMuscleGroup}
+          onContinue={handleContinueFromHome}
+          onOpenFavorites={() => setStep('favorites')}
+        />
       )}
 
       {step === 'favorites' && <FavoritesScreen onBack={() => setStep('home')} />}
 
-      {step === 'level' && muscleGroup && (
-        <LevelScreen muscleGroup={muscleGroup} onSelect={handleSelectLevel} onBack={() => setStep('home')} />
+      {step === 'level' && muscleGroups.length > 0 && (
+        <LevelScreen muscleGroups={muscleGroups} onSelect={handleSelectLevel} onBack={() => setStep('home')} />
       )}
 
       {step === 'duration' && (
         <DurationScreen onSelect={handleSelectDuration} onBack={() => setStep('level')} />
       )}
 
-      {step === 'preview' && muscleGroup && level && duration && (
+      {step === 'preview' && muscleGroups.length > 0 && level && duration && (
         <RoutinePreviewScreen
-          muscleGroup={muscleGroup}
+          muscleGroups={muscleGroups}
           level={level}
           duration={duration}
           routine={routine}
@@ -86,18 +97,13 @@ function App() {
         />
       )}
 
-      {step === 'workout' && muscleGroup && routine.length > 0 && (
-        <WorkoutScreen
-          routine={routine}
-          muscleGroup={muscleGroup}
-          onExit={() => setStep('preview')}
-          onFinish={() => setStep('done')}
-        />
+      {step === 'workout' && muscleGroups.length > 0 && routine.length > 0 && (
+        <WorkoutScreen routine={routine} onExit={() => setStep('preview')} onFinish={() => setStep('done')} />
       )}
 
-      {step === 'done' && muscleGroup && level && duration && (
+      {step === 'done' && muscleGroups.length > 0 && level && duration && (
         <CompletionScreen
-          muscleGroup={muscleGroup}
+          muscleGroups={muscleGroups}
           level={level}
           duration={duration}
           exerciseCount={routine.length}

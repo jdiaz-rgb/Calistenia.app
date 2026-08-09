@@ -42,7 +42,7 @@ export interface RoutineExercise extends Exercise {
 }
 
 export interface RoutineConfig {
-  muscleGroup: MuscleGroup;
+  muscleGroups: MuscleGroup[];
   level: Level;
   duration: DurationMinutes;
 }

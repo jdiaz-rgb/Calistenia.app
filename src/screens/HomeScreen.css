@@ -94,3 +94,14 @@
   flex-direction: column;
   gap: 12px;
 }
+
+.home-screen__cta {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 16px 20px calc(20px + var(--safe-bottom));
+  background: linear-gradient(180deg, transparent, rgba(5, 5, 10, 0.9) 30%, var(--bg-base) 60%);
+}
